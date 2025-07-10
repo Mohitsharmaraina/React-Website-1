@@ -1,23 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export default function StopWatch() {
-  const [time, setTime] = useState({ hr: 0, min: 0, sec: 0 });
-  const [status, setStatus] = useState();
+  const [time, setTime] = useState({ hr: "00", min: "00", sec: "00" });
+  const [id, setId] = useState();
+  const [isRunning, setIsRunning] = useState(false);
+  const [laps, setLaps] = useState([]);
 
   let updhr = time.hr;
   let updmin = time.min;
   let updsec = time.sec;
 
   const start = () => {
-    updater();
-    setStatus(setInterval(updater, 1000));
+    if (!isRunning) {
+      updater();
+      setId(setInterval(updater, 1000));
+    }
+    setIsRunning(true);
   };
   const stop = () => {
-    clearInterval(status);
+    clearInterval(id);
+    setIsRunning(false);
   };
   const reset = () => {
-    clearInterval(status);
-    setTime({ hr: 0, min: 0, sec: 0 });
+    clearInterval(id);
+    setTime({ hr: "00", min: "00", sec: "00" });
+    setIsRunning(false);
   };
 
   const updater = () => {
@@ -30,35 +37,84 @@ export default function StopWatch() {
       updhr++;
     }
     updsec++;
-    return setTime({ hr: updhr, min: updmin, sec: updsec });
+    return setTime({
+      hr: updhr.toString().padStart(2, "0"),
+      min: updmin.toString().padStart(2, "0"),
+      sec: updsec.toString().padStart(2, "0"),
+    });
   };
+
+  function printTime() {
+    setLaps([
+      ...laps,
+      {
+        hr: time.hr,
+        min: time.min,
+        sec: time.sec,
+      },
+    ]);
+    console.log(laps);
+  }
+  const memoizedLapDisplay = useMemo(() => {
+    return (
+      <div className="card text-xl text-medium">
+        {console.log("I amd rendered again")}
+        <ol>
+          {laps.length > 0 ? (
+            laps.map((item, i) => (
+              <li key={i}>
+                {i}) {`${item.hr}:${item.min}:${item.sec}`}
+              </li>
+            ))
+          ) : (
+            <h2>No Record Yet.</h2>
+          )}
+        </ol>
+      </div>
+    );
+  }, [laps]);
+
   return (
-    <div className=" h-50 bg-slate-300 text-center justify-center ">
-      <h1 className="w-30 h-10 bg-slate-100 p-3 ml-[49%]  mb-5 rounded-lggit">
-        {`${time.hr < 10 ? "0" + time.hr : time.hr}:${
-          time.min < 10 ? "0" + time.min : time.min
-        }:${time.sec < 10 ? "0" + time.sec : time.sec}`}
-      </h1>
-      <div className="space-x-8">
-        <button
+    <div className="card ">
+      <h1 className="card">{`${time.hr}:${time.min}:${time.sec}`}</h1>
+
+      <div className="flex space-x-2">
+        <timerbtn
           onClick={start}
-          className=" text-white text-sm p-1 w-16 rounded-lg bg-green-400 hover:bg-green-300 active:bg-green-400 hover:text-black click:disable "
+          disabled={isRunning}
+          className={`timerbtn ${isRunning ? "bg-blue-100" : "bg-blue-500"}   `}
         >
           Start
-        </button>
-        <button
+        </timerbtn>
+        <timerbtn
           onClick={stop}
-          className=" text-white text-sm p-1 w-16 rounded-lg bg-red-400 hover:bg-red-300 active:bg-red-400 hover:text-black "
+          disabled={!isRunning}
+          className={`timerbtn ${isRunning ? "bg-red-400" : "bg-red-200"}   `}
         >
           Stop
-        </button>
-        <button
+        </timerbtn>
+        <timerbtn
           onClick={reset}
-          className=" text-white text-sm p-1 w-16 rounded-lg bg-gray-500 hover:bg-gray-400 active:bg-gray-500 hover:text-black "
+          disabled={time.hr === "00" && time.min === "00" && time.sec === "00"}
+          className={` timebtn ${
+            (time.hr === "00" && time.min === "00",
+            time.sec === "00" ? "bg-gray-200" : "bg-gray-400")
+          }   `}
         >
           Reset
-        </button>
+        </timerbtn>
+        <timerbtn
+          onClick={printTime}
+          disabled={time.hr === "00" && time.min === "00" && time.sec === "00"}
+          className={` timerbtn ${
+            (time.hr === "00" && time.min === "00",
+            time.sec === "00" ? "bg-sky-200" : "bg-sky-400")
+          }   `}
+        >
+          Laspse
+        </timerbtn>
       </div>
+      {memoizedLapDisplay}
     </div>
   );
 }
