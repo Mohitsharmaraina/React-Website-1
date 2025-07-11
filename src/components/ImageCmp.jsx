@@ -1,4 +1,4 @@
-import sideLogo from "../../public/bgImages/bgSide.jpeg";
+import sideLogo from "../bgImages/bgSide.jpeg";
 
 export default function ImageCmp() {
   return (

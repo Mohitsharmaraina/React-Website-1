@@ -10,6 +10,7 @@ export default function Navbar() {
     { name: "Timer", to: "/timer" },
     { name: "ToDoList", to: "/todo" },
     { name: "Counter", to: "/counter" },
+    { name: "User", to: "/user" },
   ];
 
   return (

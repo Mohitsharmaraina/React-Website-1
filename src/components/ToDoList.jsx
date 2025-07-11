@@ -1,6 +1,6 @@
 // to-do list
 import { useState, useRef } from "react";
-
+import LoadingSpinner from "./LoadingSpinner";
 export default function App() {
   const [taskInput, setTaskInput] = useState(""); // holds current input value
   const [tasks, setTasks] = useState([]); // holds array of tasks
@@ -100,6 +100,7 @@ export default function App() {
             ))
           )}
         </ol>
+        <LoadingSpinner />
       </div>
     </>
   );
